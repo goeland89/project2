@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Login</title>
+        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+        <script src="{{ url_for('static', filename='login.js') }}"></script>
+    </head>
+    <body>
+      <form id="registration" method="post">
+        <fieldset>
+          <legend>Please register:</legend>
+          <p>Your name: <input id="username" type="text" required autofocus></p>
+          <input type="submit" value="Register">
+        </fieldset>
+      </form>
+    </body>
+</html>
