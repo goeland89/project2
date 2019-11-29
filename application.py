@@ -10,11 +10,10 @@ socketio = SocketIO(app)
 #socketio = SocketIO(app, engineio_logger=True, logger=True)
 
 channels = {}
+users = {}
 
 @app.route("/", methods=["POST", "GET"])
 def login():
-    if request.method == "POST":
-        return redirect("/channels")
     return render_template("login.html")
 
 @app.route("/channels", methods=["POST", "GET"])
@@ -25,10 +24,21 @@ def channelroom():
 def room():
     return render_template("channel.html")
 
+@socketio.on("check_registration")
+def on_check_registration(data):
+    username = data["username"]
+    print(users)
+    if username in users:
+        emit("user_already_exists")
+    else:
+        users[username] = ""
+        emit("login", username)
+
 #Register new user
 @socketio.on("register")
 def on_register():
-    emit("registered", channels)
+    emit("registered1", users, broadcast=True)
+    emit("registered2", channels)
 
 @socketio.on("newchannel")
 def on_new_channel(data):
@@ -47,7 +57,7 @@ def on_join(data):
         emit("joined_room", (channel_name, channels[channel_name]))
         return redirect("/channel")
     else:
-        emit("no_such_channel")
+        emit("no_such_channel")    
 
 @socketio.on("new_message")
 def on_new_message(data):
@@ -67,3 +77,8 @@ def on_connected_to_room(data):
         emit("open_room", channels[channel_name])
     else:
         emit("no_such_room")
+
+@socketio.on("disco")
+def on_disco(data):
+    username = data["username"]
+    users.pop(username)

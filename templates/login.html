@@ -6,12 +6,11 @@
         <script src="{{ url_for('static', filename='login.js') }}"></script>
     </head>
     <body>
-      <form id="registration" method="post">
-        <fieldset>
-          <legend>Please register:</legend>
-          <p>Your name: <input id="username" type="text" required autofocus></p>
-          <input type="submit" value="Register">
-        </fieldset>
-      </form>
+      <fieldset>
+        <legend>Please register:</legend>
+        <p>Your name: <input id="username" type="text" required autofocus></p>
+        <button id="registration">Register</button>
+      </fieldset>
+    <div id="login_message"></div>
     </body>
 </html>

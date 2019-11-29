@@ -18,7 +18,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  socket.on('registered', channels => {
+  socket.on('registered1', users => {
+    console.log('update list of users');
+    document.getElementById('user_list').innerHTML = '';
+    for (user in users) {
+      display_user(user);
+    }
+  });
+
+  socket.on('registered2', (channels, users) => {
     console.log('registered');
     for (channel_name in channels) {
       create_channel(channel_name);
@@ -26,6 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (localStorage.room) {
       socket.emit('join', {'channel_name': localStorage.room});
     }
+  });
+
+  socket.on('user_already_exists', () => {
+    logout();
   });
 
   document.getElementById('createnewchannel').onclick = () => {
@@ -45,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('disco').onclick = () => {
     console.log('disco');
+    socket.emit('disco', {'username': localStorage.username})
     logout();
   };
 
@@ -83,6 +96,28 @@ document.addEventListener('DOMContentLoaded', () => {
     socket.disconnect();
     // go back to the login page
     window.location.href = "/";
+  };
+
+  function display_user(user_name) {
+    const newUser = document.createElement('li');
+    const newLink = document.createElement('a');
+    newLink.href = '#';
+    newLink.innerHTML = user_name;
+    newLink.id = user_name;
+    newUser.append(newLink);
+    document.getElementById('user_list').append(newUser);
+
+    newLink.onclick = () => {
+      const user_name = newLink.id;
+      console.log(user_name);
+      if(user_name == localStorage.username) {
+        document.getElementById('new_user_message').innerHTML = 'You have selected yourself. Select another user.';
+      } else {
+        document.getElementById('new_user_message').innerHTML = '';
+        //TO DO: build private chat
+        socket.emit('privateChat', {'channel_name': user_name});
+      }
+    };
   };
 
 });
