@@ -21,7 +21,7 @@ def login():
 def channelroom():
     return render_template("channels.html")
 
-@app.route("channel", methods=["POST", "GET"])
+@app.route("/channel", methods=["POST", "GET"])
 def room():
     return render_template("channel.html")
 
@@ -43,7 +43,11 @@ def on_new_channel(data):
 @socketio.on("join")
 def on_join(data):
     channel_name = data["channel_name"]
-    emit("joined_room", (channel_name, channels[channel_name]))
+    if channel_name in channels:
+        emit("joined_room", (channel_name, channels[channel_name]))
+        return redirect("/channel")
+    else:
+        emit("no_such_channel")
 
 @socketio.on("new_message")
 def on_new_message(data):
@@ -52,6 +56,14 @@ def on_new_message(data):
     #save content in channel as the last item
     channels[channel_name].append(content)
     #remove 1st item if lenght is above 100
-    if channels[channel_name].length() > 100:
+    if len(channels[channel_name]) > 100:
         channels[channel_name].pop(0)
-    emit("new_message_sent", channels[channel_name], broadcast=True)
+    emit("new_message_sent", (channel_name, channels[channel_name]), broadcast=True)
+
+@socketio.on("connected_to_room")
+def on_connected_to_room(data):
+    channel_name = data["channel_name"]
+    if channel_name in channels:
+        emit("open_room", channels[channel_name])
+    else:
+        emit("no_such_room")

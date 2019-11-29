@@ -3,7 +3,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
   if (localStorage.username) {
-    window.location.href = "/channelroom";
+    window.location.href = "/channels";
   }
 
   document.getElementById('registration').onsubmit = () => {
