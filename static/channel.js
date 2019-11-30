@@ -32,10 +32,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   };
 
-  socket.on('new_message_sent', (channel_name, content) => {
+  socket.on('new_message_sent', (channel_name, channelContent) => {
     console.log("new message sent");
     if (channel_name == localStorage.room) {
-      displayMessages(content);
+      displayMessages(channelContent["messages"]);
     }
   });
 
@@ -43,9 +43,9 @@ document.addEventListener('DOMContentLoaded', () => {
     leaveChannel();
   });
 
-  socket.on('open_room', content => {
+  socket.on('open_room', channelContent => {
     console.log("room open");
-    displayMessages(content);
+    displayMessages(channelContent["messages"]);
   });
 
   function leaveChannel() {

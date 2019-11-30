@@ -26,10 +26,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  socket.on('registered2', (channels, users) => {
+  socket.on('registered2', channels => {
     console.log('registered');
+    var user1, user2;
     for (channel_name in channels) {
-      create_channel(channel_name);
+      user1 = channels[channel_name]['users'][0];
+      user2 = channels[channel_name]['users'][1];
+      if (localStorage.username == user1 || localStorage.username == user2 || channels[channel_name]['users'].length == 0) {
+        create_channel(channel_name);
+      }
     }
     if (localStorage.room) {
       socket.emit('join', {'channel_name': localStorage.room});
@@ -50,9 +55,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('new_channel_message').innerHTML = "Channel already exists";
   });
 
-  socket.on('channel_created', channel_name => {
-    document.getElementById('new_channel_message').innerHTML = "Channel has been created";
-    create_channel(channel_name);
+  socket.on('channel_created', (channel_name, channels) => {
+    var user1 = channels[channel_name]['users'][0];
+    var user2 = channels[channel_name]['users'][1];
+    if (localStorage.username == user1 || localStorage.username == user2 || channels[channel_name]['users'].length == 0) {
+      document.getElementById('new_channel_message').innerHTML = "Channel has been created";
+      create_channel(channel_name);
+    }
   });
 
   document.getElementById('disco').onclick = () => {
@@ -115,9 +124,14 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         document.getElementById('new_user_message').innerHTML = '';
         //TO DO: build private chat
-        socket.emit('privateChat', {'channel_name': user_name});
+        const channel_name = 'private chat between ' + localStorage.username + ' and ' + user_name;
+        socket.emit('privateChat', {'channel_name': channel_name, 'user1': localStorage.username, 'user2': user_name});
       }
     };
   };
+
+  socket.on('existing_private_chat', () => {
+    document.getElementById('new_channel_message').innerHTML = "Private chat already exists";
+  });
 
 });
